@@ -16,13 +16,10 @@
 --
 
 local M = {}
-parsers = {}
+local parsers = {}
 function tableconvert(indata)
-	local t = {}
 	local datatype = string.byte(indata:sub(1,1))
-	for c in indata:sub(2):gmatch(".") do
-		table.insert(t,string.byte(c))
-	end
+	local t = { indata:byte(2, #indata) }
 	return datatype,t
 end
 
@@ -65,6 +62,8 @@ function M.parse(data)
 	if parsers[datatype] then
 		realdata = parsers[datatype](mytable)
 		return(realdata)
+	else
+		return(nil)
 	end
 end
 
