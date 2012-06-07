@@ -1,7 +1,7 @@
 --
 --------------------------------------------------------------------------------
---         FILE:  read.lua
---        USAGE:  ./read.lua 
+--         FILE:  parse.lua
+--        USAGE:  require "parse"
 --  DESCRIPTION:  Read data from rfxcom
 --      OPTIONS:  ---
 -- REQUIREMENTS:  ---
@@ -15,8 +15,7 @@
 --------------------------------------------------------------------------------
 --
 
-module(...,package.seeall)
-
+local M = {}
 parsers = {}
 function tableconvert(indata)
 	local t = {}
@@ -61,10 +60,12 @@ parsers[80]=function(indata)
 	return t
 end
 
-function parse(data)
+function M.parse(data)
 	datatype, mytable = tableconvert(data)
 	if parsers[datatype] then
 		realdata = parsers[datatype](mytable)
 		return(realdata)
 	end
 end
+
+return M
