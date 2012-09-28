@@ -39,11 +39,26 @@ function parsesome(indata, subtypes, idbytes)
 	t['subname']=subtypes[indata[1]]
 	t['seqnr']=indata[2]
 	while (bytes < idbytes) do
-		print(id, bytes)
 		id=bit.lshift(id,8)+indata[3+bytes]
 		bytes=bytes+1
 	end
 	t['id']=id
+	return t
+end
+
+parsers[0x01]=function(indata)
+	local t = {}
+	local rectrans = { [0x50] = "310MHz", [0x51] = "315MHz",
+			[0x52] = "433.92MHz receiver only",
+			[0x53] = "433.92MHz transceiver",
+			[0x55] = "868.00MHz", [0x56] = "868.00MHz FSK",
+			[0x57] = "868.30MHz", [0x58] = "868.30MHz FSK",
+			[0x59] = "868.35MHz", [0x5A] = "868.35MHz FSK",
+			[0x5B] = "868.95MHz"
+	}
+	t['type']=rectrans[indata[4]]
+	t['typeraw']=indata[4]
+	t['fw version']=indata[5]
 	return t
 end
 
