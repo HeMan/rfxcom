@@ -34,22 +34,25 @@ function splitid(id, idbytes)
 	return idstring
 end
 
-function M.reset()
-	return string.char(0,0,0,0,0,0,0,0,0,0,0,0,0)
-end  ----------  end of function reset  ----------
-
-
-function M.get_status()
-	return string.char(0,0,1,2,0,0,0,0,0,0,0,0,0)
-end  ----------  end of function get_status  ----------
-
-encoders[LIGHTNING2] = function(subtype, id, unitcode, command)
-	return string.char(LIGHTNING2, subtype, 0)..splitid(id, 4)..string.char(unitcode, command, 0, 0)
+function addlen(data)
+	return string.char(string.len(data))..data
 end
 
-function M.encode(package)
-	return string.char(string.len(package))..package
-end  ----------  end of function M.encode  ----------
+function M.reset()
+	return addlen(string.char(0,0,0,0,0,0,0,0,0,0,0,0,0))
+end  ----------  end of function reset  ----------
+
+function M.get_status()
+	return addlen(string.char(0,0,1,2,0,0,0,0,0,0,0,0,0))
+end  ----------  end of function get_status  ----------
+
+encoders[LIGHTNING1] = function(subtype, housecode, unitcode, command)
+	return addlen(string.char(LIGHTNING1, subtype, 0)..housecode..string.char(unitcode, command, 0))
+end
+
+encoders[LIGHTNING2] = function(subtype, id, unitcode, command)
+	return addlen(string.char(LIGHTNING2, subtype, 0)..splitid(id, 4)..string.char(unitcode, command, 0, 0))
+end
 
 M.encoders = encoders
 return M
