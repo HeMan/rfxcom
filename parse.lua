@@ -101,6 +101,25 @@ parsers[RECEIVERTRANSMITTER] = function(indata)
 	return t
 end
 
+parsers[LIGHTNING1] = function(indata)
+	local t = {}
+
+	local subtypes = { [0x00] = 'X10 lighting', 'ARC', 'ELRO AB400D (Flamingo)',
+			'Waveman', 'Chacon EMW200', 'IMPULS', 'RisingSun',
+			'Philips SBC' }
+	local command = { [0x00] = 'Off', 'On', 'Dim', 'Bright', 'All/group off',
+			'All/group on', 'Chime', [0xFF]='Illigal command' }
+
+	t = parsesome(indata, subtypes, 2)
+
+	t['housecode'] = string.char(indata[3])
+	t['unitcode'] = indata[4]
+	t['command'] = command[indata[5]]
+	t['rssi'] = bit.band(indata[6], 0x0F)
+
+
+end
+
 --- Parses data from remote
 -- Parses data from remote of type 0x11
 -- @param indata is "raw" data in a table
@@ -146,7 +165,7 @@ parsers[TEMP] = function(indata)
 	end
 
 	t['battery'] = bit.rshift(indata[7], 4)
-	t['rssi'] = bit.band(indata[7], 15)
+	t['rssi'] = bit.band(indata[7], 0x0F)
 
 	return t
 end
