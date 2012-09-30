@@ -41,7 +41,7 @@ end
 -- @return returns table with subtype, subname, seqnr and id
 
 function parsesome(indata, subtypes, idbytes)
-	local t = {}
+	local t = indata
 	local bytes = 0
 	local id = 0
 
@@ -65,17 +65,47 @@ end
 -- @return table with info about the RFXcom
 
 parsers[INTERFACE] = function(indata)
-	local t = {}
+	local t = indata
+	local enabled = {}
+	local disabled = {}
 
-	local rectrans = { [0x50] = "310MHz", "315MHz", 
+	local rectrans = { [0x50] = "310MHz", "315MHz",
 			"433.92MHz receiver only", "433.92MHz transceiver",
 			"868.00MHz", "868.00MHz FSK", "868.30MHz", 
 			"868.30MHz FSK", "868.35MHz", "868.35MHz FSK",
 			"868.95MHz" }
+	local msg3 = { [0x80] = 'Undecoded', [0x40] = 'RFU6', [0x20] = 'RFU5',
+			[0x10] = 'RFU4', [0x08] = 'RFU3',
+			[0x04] = 'FineOffset/Vikin', [0x02] = 'Rubicson',
+			[0x01] = 'AE' }
+	local msg4 = { [0x80] = 'BlindsT1', [0x40] = 'BlindsT0',
+			[0x20] = 'ProGuard', [0x10] = 'FS20',
+			[0x08] = 'La Crosse', [0x04] = 'Hideki/UPM',
+			[0x02] = 'LightwaveRF', [0x01] = 'Metrik' }
+	local msg5 = { [0x80] = 'Visonic', [0x40] = 'ATI',
+			[0x20] = 'Oregon Scientific', [0x10] = 'Meiantech',
+			[0x08] = 'HomeEasy EU', [0x04] = 'AC',
+			[0x02] = 'ARC', [0x01] = 'X10' }
+
+	bitmap = function(val, map, enabled, disabled)
+		for s,c in pairs(map) do
+			if bit.check(val, s) then
+				table.insert(enabled, c)
+			else
+				table.insert(disabled, c)
+			end
+		end
+		return enabled, disabled
+	end
 
 	t['type'] = rectrans[indata[4]]
 	t['typeraw'] = indata[4]
 	t['fw version'] = indata[5]
+	enabled, disabled = bitmap(indata[6], msg3, enabled, disabled)
+	enabled, disabled = bitmap(indata[7], msg4, enabled, disabled)
+	enabled, disabled = bitmap(indata[8], msg5, enabled, disabled)
+	t['enabled']=table.concat(enabled,', ')
+	t['disabled']=table.concat(disabled,', ')
 
 	return t
 end
@@ -86,7 +116,7 @@ end
 -- @return table with status of lates operation
 
 parsers[RECEIVERTRANSMITTER] = function(indata)
-	local t = {}
+	local t = indata
 
 	local response = { [0x00] = 'ACK, transmit OK',
 			'ACK, but transmit started after 3 seconds delay anyway with RF receive data',
@@ -117,6 +147,7 @@ parsers[LIGHTNING1] = function(indata)
 	t['command'] = command[indata[5]]
 	t['rssi'] = bit.band(indata[6], 0x0F)
 
+	return t
 
 end
 
