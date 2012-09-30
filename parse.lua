@@ -81,6 +81,10 @@ parsers[INTERFACE] = function(indata)
 end
 
 --- Parses status message from receiver
+-- Parses the status message from receiver/transmitter
+-- @param indata is "raw" data in a table
+-- @return table with status of lates operation
+
 parsers[RECEIVERTRANSMITTER] = function(indata)
 	local t = {}
 
