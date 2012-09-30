@@ -40,11 +40,19 @@ end
 
 function M.reset()
 	return addlen(string.char(0,0,0,0,0,0,0,0,0,0,0,0,0))
-end  ----------  end of function reset  ----------
+end  ----------  end of function M.reset  ----------
 
 function M.get_status()
 	return addlen(string.char(0,0,1,2,0,0,0,0,0,0,0,0,0))
-end  ----------  end of function get_status  ----------
+end  ----------  end of function M.get_status  ----------
+
+function M.enable_all ()
+	return addlen(string.char(0,0,0,4,0,0,0,0,0,0,0,0,0))
+end  ----------  end of function M.enable_all  ----------
+
+function M.enable_undecoded ()
+	return addlen(string.char(0,0,0,5,0,0,0,0,0,0,0,0,0))
+end  ----------  end of function M.enable_undecoded  ----------
 
 encoders[LIGHTNING1] = function(subtype, housecode, unitcode, command)
 	return addlen(string.char(LIGHTNING1, subtype, 0)..housecode..string.char(unitcode, command, 0))
