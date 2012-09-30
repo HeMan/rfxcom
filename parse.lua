@@ -30,6 +30,7 @@ local parsers = {}
 function tableconvert(indata)
 	local datatype = string.byte(indata:sub(1, 1))
 	local t = { indata:byte(2, #indata) }
+
 	return datatype, t
 end
 
@@ -54,6 +55,7 @@ function parsesome(indata, subtypes, idbytes)
 	end
 
 	t['id'] = id
+
 	return t
 end
 
@@ -74,6 +76,7 @@ parsers[INTERFACE] = function(indata)
 	t['type'] = rectrans[indata[4]]
 	t['typeraw'] = indata[4]
 	t['fw version'] = indata[5]
+
 	return t
 end
 
@@ -90,6 +93,7 @@ parsers[RECEIVERTRANSMITTER] = function(indata)
 	t['seq'] = indata[2]
 	t['message'] = response[indata[3]]
 	t['msgraw'] = indata[3]
+
 	return t
 end
 
@@ -111,6 +115,7 @@ parsers[LIGHTNING2] = function(indata)
 	t['command'] = commands[indata[8]]
 	t['level'] = indata[9]
 	t['rssi'] = bit.band(indata[10], 0x0F)
+
 	return t
 end
 
