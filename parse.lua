@@ -77,6 +77,22 @@ parsers[INTERFACE] = function(indata)
 	return t
 end
 
+--- Parses status message from receiver
+parsers[RECEIVERTRANSMITTER] = function(indata)
+	local t = {}
+
+	local response = { [0x00] = 'ACK, transmit OK',
+			'ACK, but transmit started after 3 seconds delay anyway with RF receive data',
+			'NAK, transmitter did not lock on the requested transmit frequency',
+			'NAK, AC address zero in id1-id4 not allowed' }
+
+	t['subtype'] = indata[1]
+	t['seq'] = indata[2]
+	t['message'] = response[indata[3]]
+	t['msgraw'] = indata[3]
+	return t
+end
+
 --- Parses data from remote
 -- Parses data from remote of type 0x11
 -- @param indata is "raw" data in a table
