@@ -50,8 +50,8 @@ encoders[LIGHTNING1] = function(subtype, housecode, unitcode, command)
 	return addlen(string.char(LIGHTNING1, subtype, 0)..housecode..string.char(unitcode, command, 0))
 end
 
-encoders[LIGHTNING2] = function(subtype, id, unitcode, command)
-	return addlen(string.char(LIGHTNING2, subtype, 0)..splitid(id, 4)..string.char(unitcode, command, 0, 0))
+encoders[LIGHTNING2] = function(subtype, id, unitcode, command, level)
+	return addlen(string.char(LIGHTNING2, subtype, 0)..splitid(id, 4)..string.char(unitcode, command, level, 0))
 end
 
 M.encoders = encoders
