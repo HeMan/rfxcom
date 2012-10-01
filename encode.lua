@@ -28,16 +28,16 @@ local E = {}
 -- @param idbytes the number of bytes it represents
 -- @return a binary "string" of the id, size idbytes
 
-function splitid(id, idbytes)
-	local bytes = 0
-	local idstring = ''
-	while bytes < idbytes do
-		print(id)
-		idstring = string.char(bit.band(id, 0xFF))..idstring
-		id = bit.rshift(id, 8)
-		bytes = bytes + 1
-	end
-	return idstring
+local function splitid(id, idbytes)
+  local bytes = 0
+  local idstring = ''
+  while bytes < idbytes do
+    print(id)
+    idstring = string.char(bit.band(id, 0xFF))..idstring
+    id = bit.rshift(id, 8)
+    bytes = bytes + 1
+  end
+  return idstring
 end
 
 --- builds binary blob
@@ -46,24 +46,24 @@ end
 -- @param arg an table that could contain integers, strings or tables
 -- @return a binary "string" with first charcter representing lenght
 
-function build ( arg )
-	local blob = ''
-	function untable ( arg )
-		local str = ''
-		for key, val in pairs(arg) do
-			print(type(val))
-			if type(val) == "table" then
-				str = str..untable(val)
-			elseif type(val) == "string" then
-				str = str..val
-			else
-				str = str..string.char(val)
-			end
-		end
-		return str
-	end  ----------  end of function untable  ----------
-	blob = untable(arg)
-	return string.char(string.len(blob))..blob
+local function build ( arg )
+  local blob = ''
+  local function untable ( arg )
+    local str = ''
+    for key, val in pairs(arg) do
+      print(type(val))
+      if type(val) == "table" then
+        str = str..untable(val)
+      elseif type(val) == "string" then
+        str = str..val
+      else
+        str = str..string.char(val)
+      end
+    end
+    return str
+  end  ----------  end of function untable  ----------
+  blob = untable(arg)
+  return string.char(string.len(blob))..blob
 end  ----------  end of function build  ----------
 
 --- Creates reset message
@@ -71,7 +71,7 @@ end  ----------  end of function build  ----------
 -- @return a binary "string"
 
 function M.reset()
-	return build{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+  return build{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 end  ----------  end of function M.reset  ----------
 
 --- Creates get status message
@@ -79,7 +79,7 @@ end  ----------  end of function M.reset  ----------
 -- @return a binary "string"
 
 function M.get_status()
-	return build{0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+  return build{0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 end  ----------  end of function M.get_status  ----------
 
 --- Creates enable all message
@@ -88,7 +88,7 @@ end  ----------  end of function M.get_status  ----------
 -- @return a binary "string"
 
 function M.enable_all ()
-	return build{0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+  return build{0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 end  ----------  end of function M.enable_all  ----------
 
 --- Creates enable undecoded message
@@ -97,7 +97,7 @@ end  ----------  end of function M.enable_all  ----------
 -- @return a binary "string"
 
 function M.enable_undecoded ()
-	return build{0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+  return build{0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 end  ----------  end of function M.enable_undecoded  ----------
 
 --- Creates message for LIGHTNING1 (0x10) protocol
@@ -109,7 +109,7 @@ end  ----------  end of function M.enable_undecoded  ----------
 -- @return a binary "string"
 
 E[LIGHTNING1] = function(subtype, housecode, unitcode, command)
-	return buid{LIGHTNING1, subtype, 0, housecode, unitcode, command, 0}
+  return buid{LIGHTNING1, subtype, 0, housecode, unitcode, command, 0}
 end
 
 --- Creates message for LIGHTNING2 (0x11) protocol
@@ -122,7 +122,7 @@ end
 -- @return a binary "string"
 
 E[LIGHTNING2] = function(subtype, id, unitcode, command, level)
-	return build{LIGHTNING2, subtype, 0,splitid(id, 4),unitcode, command, level, 0}
+  return build{LIGHTNING2, subtype, 0,splitid(id, 4),unitcode, command, level, 0}
 end
 
 M.encode = E
