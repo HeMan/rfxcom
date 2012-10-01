@@ -1,4 +1,4 @@
---
+---
 --------------------------------------------------------------------------------
 --         FILE:  encode.lua
 --        USAGE:  require "encode"
@@ -24,8 +24,8 @@ local E = {}
 
 --- Splits number to bytes
 -- Internal function to split a large number to bytes
--- @parm id is the number to be splitted
--- @parm idbytes is the number of bytes it represents
+-- @param id the number to be splitted
+-- @param idbytes the number of bytes it represents
 -- @return a binary "string" of the id, size idbytes
 
 function splitid(id, idbytes)
@@ -43,7 +43,7 @@ end
 --- builds binary blob
 -- Internal function to take integers, strings and tables and serialize them
 -- to a binary "string" and add length as first character
--- @parm arg is an table that could contain integers, strings or tables
+-- @param arg an table that could contain integers, strings or tables
 -- @return a binary "string" with first charcter representing lenght
 
 function build ( arg )
@@ -102,10 +102,10 @@ end  ----------  end of function M.enable_undecoded  ----------
 
 --- Creates message for LIGHTNING1 (0x10) protocol
 -- Encodes a message to control LIGHTNING1 devices
--- @parm subtype is the type of the device
--- @parm housecode is the group selector on the device group
--- @parm unitcode is the device selector on the device
--- @parm command is the command to send
+-- @param subtype the type of the device
+-- @param housecode the group selector on the device group
+-- @param unitcode the device selector on the device
+-- @param command the command to send
 -- @return a binary "string"
 
 E[LIGHTNING1] = function(subtype, housecode, unitcode, command)
@@ -114,11 +114,11 @@ end
 
 --- Creates message for LIGHTNING2 (0x11) protocol
 -- Encodes a message to control LIGHTNING2 devices
--- @parm subtype is the type of the device
--- @parm id is the group selector for the device group
--- @parm unitcode is the the device selector for the device
--- @parm command is the command to send
--- @parm level is the level to fade to
+-- @param subtype the type of the device
+-- @param id the group selector for the device group
+-- @param unitcode the the device selector for the device
+-- @param command the command to send
+-- @param level the level to fade to
 -- @return a binary "string"
 
 E[LIGHTNING2] = function(subtype, id, unitcode, command, level)
