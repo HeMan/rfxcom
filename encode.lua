@@ -36,9 +36,10 @@ local function splitid(id, idbytes)
     idstring = string.char(bit.band(id, 0xFF))..idstring
     id = bit.rshift(id, 8)
     bytes = bytes + 1
-  end
+  end -- while more bytes
   return idstring
-end
+end ----------  end of function splitid  ----------
+
 
 --- builds binary blob
 -- Internal function to take integers, strings and tables and serialize them
@@ -50,7 +51,7 @@ local function build ( arg )
   local blob = ''
   local function untable ( arg )
     local str = ''
-    for key, val in pairs(arg) do
+    for _, val in pairs(arg) do
       print(type(val))
       if type(val) == "table" then
         str = str..untable(val)
@@ -58,8 +59,8 @@ local function build ( arg )
         str = str..val
       else
         str = str..string.char(val)
-      end
-    end
+      end -- if type
+    end -- end loop
     return str
   end  ----------  end of function untable  ----------
   blob = untable(arg)
@@ -110,7 +111,7 @@ end  ----------  end of function M.enable_undecoded  ----------
 
 E[LIGHTNING1] = function(subtype, housecode, unitcode, command)
   return buid{LIGHTNING1, subtype, 0, housecode, unitcode, command, 0}
-end
+end ----------  end of function E[LIGHTNING1]  ----------
 
 --- Creates message for LIGHTNING2 (0x11) protocol
 -- Encodes a message to control LIGHTNING2 devices
@@ -123,7 +124,7 @@ end
 
 E[LIGHTNING2] = function(subtype, id, unitcode, command, level)
   return build{LIGHTNING2, subtype, 0,splitid(id, 4),unitcode, command, level, 0}
-end
+end ----------  end of function E[LIGHTNING2]  ----------
 
 M.encode = E
 return M

@@ -32,7 +32,8 @@ local function tableconvert(indata)
   local t = { indata:byte(2, #indata) }
 
   return datatype, t
-end
+end  ----------  end of function tableconvert  ----------
+
 
 --- Function to reduce boilerplate code
 -- Returns the subtype and id from indata
@@ -52,13 +53,14 @@ local function parsesome(indata, subtypes, idbytes)
     while (bytes < idbytes) do
       id = bit.lshift(id, 8) + indata[3 + bytes]
       bytes = bytes + 1
-    end
+    end -- while
 
     t['id'] = id
-  end
+  end -- if idbytes
 
   return t
-end
+end ----------  end of function parsesome ----------
+
 
 --- Parse interface info
 -- Parses the interfce info and return info about the RFXcom
@@ -94,10 +96,11 @@ parsers[INTERFACE] = function(indata)
         table.insert(enabled, c)
       else
         table.insert(disabled, c)
-      end
-    end
+      end -- if bit set
+    end -- for 
     return enabled, disabled
-  end
+  end ----------  end of function bitmap  ----------
+
 
   t['type'] = rectrans[indata[4]]
   t['typeraw'] = indata[4]
@@ -109,7 +112,8 @@ parsers[INTERFACE] = function(indata)
   t['disabled']=table.concat(disabled,', ')
 
   return t
-end
+end ----------  end of function parsers[INTERFACE]  ----------
+
 
 --- Parses status message from receiver
 -- Parses the status message from receiver/transmitter
@@ -130,7 +134,8 @@ parsers[RECEIVERTRANSMITTER] = function(indata)
   t['msgraw'] = indata[3]
 
   return t
-end
+end ----------  end of function parsers[RECEIVERTRANSMITTER]  ----------
+
 
 --- "Parse" unknown data
 -- Parse the unknown data message (0x03).
@@ -147,7 +152,8 @@ parsers[UNDECODEDRF] = function(indata)
 
   t = parsesome(indata, subtypes, 0)
   return t
-end
+end ----------  end of function parsers[UNDECODEDRF]  ----------
+
 
 --- Parses data from remote
 -- Parses data from remote of type 0x10
@@ -172,7 +178,8 @@ parsers[LIGHTNING1] = function(indata)
 
   return t
 
-end
+end ----------  end of function parsers[LIGHTNING1]  ----------
+
 
 --- Parses data from remote
 -- Parses data from remote of type 0x11
@@ -194,7 +201,8 @@ parsers[LIGHTNING2] = function(indata)
   t['rssi'] = bit.band(indata[10], 0x0F)
 
   return t
-end
+end ----------  end of function parsers[LIGHTNING2]  ----------
+
 
 --- Parses data from temp sensors
 -- Parses the data from temp sensors (type 0x50)
@@ -216,13 +224,14 @@ parsers[TEMP] = function(indata)
 
   if (bit.band(indata[5], 0x80) == 0x80) then
     t['temp'] = -t['temp']
-  end
+  end -- if negative
 
   t['battery'] = bit.rshift(indata[7], 4)
   t['rssi'] = bit.band(indata[7], 0x0F)
 
   return t
-end
+end ----------  end of function parsers[TEMP]  ----------
+
 
 --- Parses the raw data
 -- Takes the raw data and converts it in to a table
@@ -238,7 +247,8 @@ function M.parse(data)
     return(realdata)
   else
     return(nil)
-  end
-end
+  end -- if exists
+end ----------  end of function m.parse  ----------
+
 
 return M
