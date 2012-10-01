@@ -1,7 +1,7 @@
 --
 --------------------------------------------------------------------------------
 --         FILE:  encode.lua
---        USAGE:  ./encode.lua 
+--        USAGE:  require "encode"
 --  DESCRIPTION:  Encoding library for rfxcom
 --      OPTIONS:  ---
 -- REQUIREMENTS:  ---
@@ -20,7 +20,13 @@ require "common"
 
 local M = {}
 
-local encoders = {}
+local E = {}
+
+--- Splits number to bytes
+-- Internal function to split a large number to bytes
+-- @parm id is the number to be splitted
+-- @parm idbytes is the number of bytes it represents
+-- @return a binary "string" of the id, size idbytes
 
 function splitid(id, idbytes)
 	local bytes = 0
@@ -34,34 +40,91 @@ function splitid(id, idbytes)
 	return idstring
 end
 
-function addlen(data)
-	return string.char(string.len(data))..data
-end
+--- builds binary blob
+-- Internal function to take integers, strings and tables and serialize them
+-- to a binary "string" and add length as first character
+-- @parm arg is an table that could contain integers, strings or tables
+-- @return a binary "string" with first charcter representing lenght
+
+function build ( arg )
+	local blob = ''
+	function untable ( arg )
+		local str = ''
+		for key, val in pairs(arg) do
+			print(type(val))
+			if type(val) == "table" then
+				str = str..untable(val)
+			elseif type(val) == "string" then
+				str = str..val
+			else
+				str = str..string.char(val)
+			end
+		end
+		return str
+	end  ----------  end of function untable  ----------
+	blob = untable(arg)
+	return string.char(string.len(blob))..blob
+end  ----------  end of function build  ----------
+
+--- Creates reset message
+-- This creates a reset message for the RFXcom
+-- @return a binary "string"
 
 function M.reset()
-	return addlen(string.char(0,0,0,0,0,0,0,0,0,0,0,0,0))
+	return build{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 end  ----------  end of function M.reset  ----------
 
+--- Creates get status message
+-- This creates a message that asks for the RFXcom status
+-- @return a binary "string"
+
 function M.get_status()
-	return addlen(string.char(0,0,1,2,0,0,0,0,0,0,0,0,0))
+	return build{0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 end  ----------  end of function M.get_status  ----------
 
+--- Creates enable all message
+-- This creates a messa ge that ask the RFXcom to turn on all it's
+-- known protocols.
+-- @return a binary "string"
+
 function M.enable_all ()
-	return addlen(string.char(0,0,0,4,0,0,0,0,0,0,0,0,0))
+	return build{0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 end  ----------  end of function M.enable_all  ----------
 
+--- Creates enable undecoded message
+-- The RFXcom could read some protocolls that it hasn't got a decoder for.
+-- This is by default turned off, but this message turns it on.
+-- @return a binary "string"
+
 function M.enable_undecoded ()
-	return addlen(string.char(0,0,0,5,0,0,0,0,0,0,0,0,0))
+	return build{0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 end  ----------  end of function M.enable_undecoded  ----------
 
-encoders[LIGHTNING1] = function(subtype, housecode, unitcode, command)
-	return addlen(string.char(LIGHTNING1, subtype, 0)..housecode..string.char(unitcode, command, 0))
+--- Creates message for LIGHTNING1 (0x10) protocol
+-- Encodes a message to control LIGHTNING1 devices
+-- @parm subtype is the type of the device
+-- @parm housecode is the group selector on the device group
+-- @parm unitcode is the device selector on the device
+-- @parm command is the command to send
+-- @return a binary "string"
+
+E[LIGHTNING1] = function(subtype, housecode, unitcode, command)
+	return buid{LIGHTNING1, subtype, 0, housecode, unitcode, command, 0}
 end
 
-encoders[LIGHTNING2] = function(subtype, id, unitcode, command, level)
-	return addlen(string.char(LIGHTNING2, subtype, 0)..splitid(id, 4)..string.char(unitcode, command, level, 0))
+--- Creates message for LIGHTNING2 (0x11) protocol
+-- Encodes a message to control LIGHTNING2 devices
+-- @parm subtype is the type of the device
+-- @parm id is the group selector for the device group
+-- @parm unitcode is the the device selector for the device
+-- @parm command is the command to send
+-- @parm level is the level to fade to
+-- @return a binary "string"
+
+E[LIGHTNING2] = function(subtype, id, unitcode, command, level)
+	return build{LIGHTNING2, subtype, 0,splitid(id, 4),unitcode, command, level, 0}
 end
 
-M.encoders = encoders
+M.encode = E
 return M
 
