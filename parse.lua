@@ -27,7 +27,7 @@ local parsers = {}
 -- @param indata the binary "string" from RFXcom
 -- @return pair of data consisting of datatype and table with data
 
-function tableconvert(indata)
+local function tableconvert(indata)
 	local datatype = string.byte(indata:sub(1, 1))
 	local t = { indata:byte(2, #indata) }
 
@@ -40,7 +40,7 @@ end
 -- @param subtypes is an array of subtypes
 -- @return returns table with subtype, subname, seqnr and id
 
-function parsesome(indata, subtypes, idbytes)
+local function parsesome(indata, subtypes, idbytes)
 	local t = indata
 	local bytes = 0
 	local id = 0
@@ -88,7 +88,7 @@ parsers[INTERFACE] = function(indata)
 			[0x08] = 'HomeEasy EU', [0x04] = 'AC',
 			[0x02] = 'ARC', [0x01] = 'X10' }
 
-	bitmap = function(val, map, enabled, disabled)
+	local function bitmap(val, map, enabled, disabled)
 		for s,c in pairs(map) do
 			if bit.check(val, s) then
 				table.insert(enabled, c)
@@ -140,7 +140,7 @@ end
 parsers[UNDECODEDRF] = function(indata)
 	local t = {}
 
-	local subtypes = { [0x00] = 'ac', 'arc', 'ati', 'hideki/upm'
+	local subtypes = { [0x00] = 'ac', 'arc', 'ati', 'hideki/upm',
 			'lacrosse/viking', 'ad', 'mertik', 'oregon1', 'oregon2',
 			'oregon3', 'proguard', 'visonic', 'nec', 'fs20',
 			'reserved', 'blinds', 'rubicson',  'ae', 'fineoffset'}
