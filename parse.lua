@@ -48,13 +48,14 @@ function parsesome(indata, subtypes, idbytes)
 	t['subtype'] = indata[1]
 	t['subname'] = subtypes[indata[1]]
 	t['seqnr'] = indata[2]
+	if (idbytes > 0) then
+		while (bytes < idbytes) do
+			id = bit.lshift(id, 8) + indata[3 + bytes]
+			bytes = bytes + 1
+		end
 
-	while (bytes < idbytes) do
-		id = bit.lshift(id, 8) + indata[3 + bytes]
-		bytes = bytes + 1
+		t['id'] = id
 	end
-
-	t['id'] = id
 
 	return t
 end
@@ -130,6 +131,28 @@ parsers[RECEIVERTRANSMITTER] = function(indata)
 
 	return t
 end
+
+--- "Parse" unknown data
+-- Parse the unknown data message (0x03).
+-- @param indata "raw" data in table
+-- @return table with the parsable info, rest is raw
+
+parsers[UNDECODEDRF] = function(indata)
+	local t = {}
+
+	local subtypes = { [0x00] = 'ac', 'arc', 'ati', 'hideki/upm'
+			'lacrosse/viking', 'ad', 'mertik', 'oregon1', 'oregon2',
+			'oregon3', 'proguard', 'visonic', 'nec', 'fs20',
+			'reserved', 'blinds', 'rubicson',  'ae', 'fineoffset'}
+
+	t = parsesome(indata, subtypes, 0)
+	return t
+end
+
+--- Parses data from remote
+-- Parses data from remote of type 0x10
+-- @param indata is "raw" data in a table
+-- @return table with remote command
 
 parsers[LIGHTNING1] = function(indata)
 	local t = {}
