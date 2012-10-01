@@ -27,7 +27,7 @@ local parsers = {}
 -- @param indata the binary "string" from RFXcom
 -- @return pair of data consisting of datatype and table with data
 
-function tableconvert(indata)
+local function tableconvert(indata)
 	local datatype = string.byte(indata:sub(1, 1))
 	local t = { indata:byte(2, #indata) }
 
@@ -40,7 +40,7 @@ end
 -- @param subtypes is an array of subtypes
 -- @return returns table with subtype, subname, seqnr and id
 
-function parsesome(indata, subtypes, idbytes)
+local function parsesome(indata, subtypes, idbytes)
 	local t = indata
 	local bytes = 0
 	local id = 0
@@ -65,7 +65,7 @@ end
 -- @param indata is "raw" data in a table
 -- @return table with info about the RFXcom
 
-parsers[INTERFACE] = function(indata)
+local parsers[INTERFACE] = function(indata)
 	local t = indata
 	local enabled = {}
 	local disabled = {}
@@ -88,7 +88,7 @@ parsers[INTERFACE] = function(indata)
 			[0x08] = 'HomeEasy EU', [0x04] = 'AC',
 			[0x02] = 'ARC', [0x01] = 'X10' }
 
-	bitmap = function(val, map, enabled, disabled)
+	local bitmap = function(val, map, enabled, disabled)
 		for s,c in pairs(map) do
 			if bit.check(val, s) then
 				table.insert(enabled, c)
@@ -116,7 +116,7 @@ end
 -- @param indata is "raw" data in a table
 -- @return table with status of lates operation
 
-parsers[RECEIVERTRANSMITTER] = function(indata)
+local parsers[RECEIVERTRANSMITTER] = function(indata)
 	local t = indata
 
 	local response = { [0x00] = 'ACK, transmit OK',
@@ -137,7 +137,7 @@ end
 -- @param indata "raw" data in table
 -- @return table with the parsable info, rest is raw
 
-parsers[UNDECODEDRF] = function(indata)
+local parsers[UNDECODEDRF] = function(indata)
 	local t = {}
 
 	local subtypes = { [0x00] = 'ac', 'arc', 'ati', 'hideki/upm'
@@ -154,7 +154,7 @@ end
 -- @param indata is "raw" data in a table
 -- @return table with remote command
 
-parsers[LIGHTNING1] = function(indata)
+local parsers[LIGHTNING1] = function(indata)
 	local t = {}
 
 	local subtypes = { [0x00] = 'X10 lighting', 'ARC', 'ELRO AB400D (Flamingo)',
@@ -179,7 +179,7 @@ end
 -- @param indata is "raw" data in a table
 -- @return table with remote command
 
-parsers[LIGHTNING2] = function(indata)
+local parsers[LIGHTNING2] = function(indata)
 	local t = {}
 
 	local subtypes = { [0] = 'AC', 'HomeEasy EU', 'ANSLUT' }
@@ -201,7 +201,7 @@ end
 -- @param indata is "raw" data in a table
 -- @return table with temp, battery status and radio level
 
-parsers[TEMP] = function(indata)
+local parsers[TEMP] = function(indata)
 	local t = {}
 	local subtypes = { "THR128/138, THC138", 
 	"THC238/268, THN132, THWR288, THRN122, THN122, AW129/131",
