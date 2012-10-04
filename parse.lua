@@ -46,16 +46,16 @@ local function parsesome(indata, subtypes, idbytes)
   local bytes = 0
   local id = 0
 
-  t['subtype'] = indata[1]
-  t['subname'] = subtypes[indata[1]]
-  t['seqnr'] = indata[2]
+  t.subtype = indata[1]
+  t.subname = subtypes[indata[1]]
+  t.seqnr = indata[2]
   if (idbytes > 0) then
     while (bytes < idbytes) do
       id = bit.lshift(id, 8) + indata[3 + bytes]
       bytes = bytes + 1
     end -- while
 
-    t['id'] = id
+    t.id = id
   end -- if idbytes
 
   return t
@@ -102,14 +102,14 @@ parsers[INTERFACE] = function(indata)
   end ----------  end of function bitmap  ----------
 
 
-  t['type'] = rectrans[indata[4]]
-  t['typeraw'] = indata[4]
-  t['fw version'] = indata[5]
+  t.type = rectrans[indata[4]]
+  t.typeraw = indata[4]
+  t.fwversion = indata[5]
   enabled, disabled = bitmap(indata[6], msg3, enabled, disabled)
   enabled, disabled = bitmap(indata[7], msg4, enabled, disabled)
   enabled, disabled = bitmap(indata[8], msg5, enabled, disabled)
-  t['enabled']=table.concat(enabled,', ')
-  t['disabled']=table.concat(disabled,', ')
+  t.enabled = table.concat(enabled,', ')
+  t.disabled = table.concat(disabled,', ')
 
   return t
 end ----------  end of function parsers[INTERFACE]  ----------
@@ -128,10 +128,10 @@ parsers[RECEIVERTRANSMITTER] = function(indata)
       'NAK, transmitter did not lock on the requested transmit frequency',
       'NAK, AC address zero in id1-id4 not allowed' }
 
-  t['subtype'] = indata[1]
-  t['seq'] = indata[2]
-  t['message'] = response[indata[3]]
-  t['msgraw'] = indata[3]
+  t.subtype = indata[1]
+  t.seq = indata[2]
+  t.message = response[indata[3]]
+  t.msgraw = indata[3]
 
   return t
 end ----------  end of function parsers[RECEIVERTRANSMITTER]  ----------
@@ -171,10 +171,10 @@ parsers[LIGHTNING1] = function(indata)
 
   t = parsesome(indata, subtypes, 2)
 
-  t['housecode'] = string.char(indata[3])
-  t['unitcode'] = indata[4]
-  t['command'] = command[indata[5]]
-  t['rssi'] = bit.band(indata[6], 0x0F)
+  t.housecode = string.char(indata[3])
+  t.unitcode = indata[4]
+  t.command = command[indata[5]]
+  t.rssi = bit.band(indata[6], 0x0F)
 
   return t
 
@@ -194,11 +194,11 @@ parsers[LIGHTNING2] = function(indata)
 
   t = parsesome(indata, subtypes, 4)
 
-  t['unitcode'] = indata[7]
-  t['cmnd'] = indata[8]
-  t['command'] = commands[indata[8]]
-  t['level'] = indata[9]
-  t['rssi'] = bit.band(indata[10], 0x0F)
+  t.unitcode = indata[7]
+  t.cmnd = indata[8]
+  t.command = commands[indata[8]]
+  t.level = indata[9]
+  t.rssi = bit.band(indata[10], 0x0F)
 
   return t
 end ----------  end of function parsers[LIGHTNING2]  ----------
@@ -219,15 +219,15 @@ parsers[TEMP] = function(indata)
 
   t = parsesome(indata, subtypes, 2)
 
-  t['tempraw'] = indata[5]*256 + indata[6]
-  t['temp'] = ((bit.band(indata[5], 0x7F))*256 + indata[6])/10
+  t.tempraw = indata[5]*256 + indata[6]
+  t.temp = ((bit.band(indata[5], 0x7F))*256 + indata[6])/10
 
   if (bit.band(indata[5], 0x80) == 0x80) then
-    t['temp'] = -t['temp']
+    t.temp = -t.temp
   end -- if negative
 
-  t['battery'] = bit.rshift(indata[7], 4)
-  t['rssi'] = bit.band(indata[7], 0x0F)
+  t.battery = bit.rshift(indata[7], 4)
+  t.rssi = bit.band(indata[7], 0x0F)
 
   return t
 end ----------  end of function parsers[TEMP]  ----------
