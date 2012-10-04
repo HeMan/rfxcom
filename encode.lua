@@ -32,7 +32,6 @@ local function splitid(id, idbytes)
   local bytes = 0
   local idstring = ''
   while bytes < idbytes do
-    print(id)
     idstring = string.char(bit.band(id, 0xFF))..idstring
     id = bit.rshift(id, 8)
     bytes = bytes + 1
@@ -52,7 +51,6 @@ local function build ( arg )
   local function untable ( arg )
     local str = ''
     for _, val in pairs(arg) do
-      print(type(val))
       if type(val) == "table" then
         str = str..untable(val)
       elseif type(val) == "string" then
