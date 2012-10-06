@@ -234,6 +234,35 @@ parsers[TEMP] = function(indata)
   return t
 end ----------  end of function parsers[TEMP]  ----------
 
+--- Parses data from temp and humidity sensors
+-- Parses the data from temp sensors (type 0x52)
+-- @param indata is "raw" data in a table
+-- @return table with temp, humidity, battery status and radio level
+
+parsers[TEMPHUM] = function(indata)
+  local t = {}
+	local subtypes = { [0x01] = "THGN122/123, THGN132, THGR122/228/238/268",
+  "THGR810, THGN800", "RTGR328", "THGR328", "WTGR800", "THGR918, THGRN228, THGN500",
+	"TFA TS34C, Cresta", "WT260,WT260H,WT440H,WT450,WT450H", "Viking 02035,02038" }
+	local humstatus = { [0x00] = "Dry", "Comfort", "Normal", "Wet" }
+
+	t = parsesome(indata, subtypes, 2)
+
+	t.tempraw = indata[5]*256 + indata[6]
+  t.temp = ((bit.band(indata[5], 0x7F))*256 + indata[6])/10
+
+  if (bit.band(indata[5], 0x80) == 0x80) then
+    t.temp = -t.temp
+  end -- if negative
+
+	t.humidity = indata[7]
+	t.humstatus = humstatus[indata[8]]
+
+  t.battery = bit.rshift(indata[9], 4)
+  t.rssi = bit.band(indata[9], 0x0F)
+
+  return t
+end  ----------  end of function parsers[TEMPHUM]  ----------
 
 --- Parses the raw data
 -- Takes the raw data and converts it in to a table
