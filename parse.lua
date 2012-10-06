@@ -15,7 +15,7 @@
 --------------------------------------------------------------------------------
 --
 
-local bit = require "bit"
+local bit = require "nixio".bit
 require "common"
 
 local M = {}
@@ -91,13 +91,15 @@ parsers[INTERFACE] = function(indata)
       [0x02] = 'ARC', [0x01] = 'X10' }
 
   local function bitmap(val, map, enabled, disabled)
-    for s,c in pairs(map) do
-      if bit.check(val, s) then
-        table.insert(enabled, c)
-      else
-        table.insert(disabled, c)
-      end -- if bit set
-    end -- for 
+    if (type(val) == "number") then
+      for s,c in pairs(map) do
+        if bit.check(val, s) then
+          table.insert(enabled, c)
+        else
+          table.insert(disabled, c)
+        end -- if bit set
+      end -- for 
+    end
     return enabled, disabled
   end ----------  end of function bitmap  ----------
 
