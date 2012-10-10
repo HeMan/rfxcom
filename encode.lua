@@ -14,7 +14,7 @@
 --     REVISION:  ---
 --------------------------------------------------------------------------------
 --
-local bit = require "bit"
+local bit = require "nixio".bit
 
 require "common"
 
