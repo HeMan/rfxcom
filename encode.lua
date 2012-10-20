@@ -108,7 +108,7 @@ end  ----------  end of function M.enable_undecoded  ----------
 -- @return a binary "string"
 
 E[LIGHTNING1] = function(subtype, housecode, unitcode, command)
-  return buid{LIGHTNING1, subtype, 0, housecode, unitcode, command, 0}
+  return build{LIGHTNING1, subtype, 0, housecode, unitcode, command, 0}
 end ----------  end of function E[LIGHTNING1]  ----------
 
 --- Creates message for LIGHTNING2 (0x11) protocol
