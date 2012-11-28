@@ -87,7 +87,7 @@ end  ----------  end of function M.get_status  ----------
 -- @return a binary "string"
 
 function M.enable_all ()
-  return build{0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+  return build{0, 0, 0, 3, 0x53, 0, 0x07, 0xBF, 0xFF, 0, 0, 0, 0}
 end  ----------  end of function M.enable_all  ----------
 
 --- Creates enable undecoded message
@@ -96,7 +96,7 @@ end  ----------  end of function M.enable_all  ----------
 -- @return a binary "string"
 
 function M.enable_undecoded ()
-  return build{0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+  return build{0, 0, 0, 3, 0x53, 0, 0x87, 0xBF, 0xFF, 0, 0, 0, 0}
 end  ----------  end of function M.enable_undecoded  ----------
 
 --- Creates message for LIGHTNING1 (0x10) protocol
