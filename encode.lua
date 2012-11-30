@@ -22,23 +22,26 @@ local M = {}
 
 local E = {}
 
---- Splits number to bytes
--- Internal function to split a large number to bytes
--- @param id the number to be splitted
--- @param idbytes the number of bytes it represents
--- @return a binary "string" of the id, size idbytes
+--- @class Protocol
+-- Base class for sending commands with rfxcom
 
-local function splitid(id, idbytes)
-  local bytes = 0
-  local idstring = ''
-  while bytes < idbytes do
-    idstring = string.char(bit.band(id, 0xFF))..idstring
-    id = bit.rshift(id, 8)
-    bytes = bytes + 1
-  end -- while more bytes
-  return idstring
-end ----------  end of function splitid  ----------
+Protocol = {}
 
+function Protocol:new()
+  o = {}   -- create object if user does not provide one
+  setmetatable(o, self)
+  self.__index = self
+  return o
+end  -----------  end of function Protocol:new  ----------
+
+--- Sends data
+-- Uses tty to send data
+-- @parm data to send
+-- @return number of bytes sent
+-- :TODO:2012-11-30 18:15:07::  Don't use global tty
+function Protocol:send(data)
+  return tty:write(data)
+end  ----------  end of function Protocol:send  ----------
 
 --- builds binary blob
 -- Internal function to take integers, strings and tables and serialize them
@@ -46,7 +49,7 @@ end ----------  end of function splitid  ----------
 -- @param arg an table that could contain integers, strings or tables
 -- @return a binary "string" with first charcter representing lenght
 
-local function build ( arg )
+function Protocol:build ( arg )
   local blob = ''
   local function untable ( arg )
     local str = ''
@@ -64,6 +67,114 @@ local function build ( arg )
   blob = untable(arg)
   return string.char(string.len(blob))..blob
 end  ----------  end of function build  ----------
+
+--- Splits number to bytes
+-- Internal function to split a large number to bytes
+-- @param id the number to be splitted
+-- @param idbytes the number of bytes it represents
+-- @return a binary "string" of the id, size idbytes
+
+function Protocol:splitid(id, idbytes)
+  local bytes = 0
+  local idstring = ''
+  while bytes < idbytes do
+    idstring = string.char(bit.band(id, 0xFF))..idstring
+    id = bit.rshift(id, 8)
+    bytes = bytes + 1
+  end -- while more bytes
+  return idstring
+end ----------  end of function splitid  ----------
+
+--- @class baseclass for all lighting protocolls
+-- Has four standard methods (off, on, groupon and groupoff)
+-- constructor takes command values when default don't work
+
+Lighting = Protocol:new()
+function Lighting:new(commands)
+	o = {}
+	setmetatable(o, self)
+	self.__index = self
+	self.commands = {}
+	self.commands.on = commands.on or 1
+	self.commands.off = commands.off or 0
+	self.commands.groupon = commands.groupon or 6
+	self.commands.groupoff = commands.groupoff or 5
+	return o
+end  ----------  end of function Lighting:new  ----------
+
+--- abstract function
+-- Abstract function for regula operations
+-- @parm id is a table with id of the receiver
+-- @parm command on/off/groupon/groupoff for the receiver
+
+function Lighting:base(id, command)
+	assert(false,"Not implemented")
+end  ----------  end of function Lighting:base  ----------
+
+--- Turn on light
+-- Turn on light, base function
+-- @parm id is a table with id of the receiver
+function Lighting:on(id)
+	self:send(self:base(id, self.commands.on))
+end  ----------  end of function Lighting:base  ----------
+
+
+--- Turn off light
+-- Turn off light, base function
+-- @parm id is a table with id of the receiver
+function Lighting:off(id)
+	self:send(self:base(id, self.commands.off))
+end  ----------  end of function Lighting:base  ----------
+
+
+--- Turn on light group
+-- Turn on light group, base function
+-- @parm id is a table with id of the receiver
+function Lighting:groupon(id)
+	self:send(self:base(id, self.commands.groupon))
+end  ----------  end of function Lighting:base  ----------
+
+
+--- Turn off light group
+-- Turn off light group, base function
+-- @parm id is a table with id of the receiver
+function Lighting:groupoff(id)
+	self:send(self:base(id, self.commands.groupoff))
+end  ----------  end of function Lighting:base  ----------
+
+--- @class Lighting1
+-- Implements the LIGHTING1 protocoll
+
+Lighting1 = Lighting:new{}
+function Lighting1:base(id, command)
+	return self.build{LIGHTING1, id.subtype, 0, id.housecode, id.unitcode, command}
+end  ----------  end of function Lighting:base  ----------
+
+--- @class Lighting2
+-- Implements the LIGHTING2 protocoll
+
+Lighting2 = Lighting:new{groupoff=3, groupon=4}
+function Lighting2:base(id, command)
+	return self.build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, command, 2}
+end  ----------  end of function Lighting:base  ----------
+
+--- LIGHTING2 extra functions
+-- LIGHTING2 has two extra functions compare to LIGHTING1
+-- setlevel is one of them
+function Lighting2:setlevel(id)
+	self:send(self.build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 2, id.level})
+end  ----------  end of function Lighting:base  ----------
+
+
+--- LIGHTING2 extra functions
+-- LIGHTING2 has two extra functions compare to LIGHTING1
+-- setlevel is one of them
+function Lighting2:setgrouplevel(id)
+	self:send(self.build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 5, id.level})
+end  ----------  end of function Lighting:base  ----------
+
+M.Lighting1 = Lighting1
+M.Lighting2 = Lighting2
 
 --- Creates reset message
 -- This creates a reset message for the RFXcom
@@ -99,20 +210,20 @@ function M.enable_undecoded ()
   return build{0, 0, 0, 3, 0x53, 0, 0x87, 0xBF, 0xFF, 0, 0, 0, 0}
 end  ----------  end of function M.enable_undecoded  ----------
 
---- Creates message for LIGHTNING1 (0x10) protocol
--- Encodes a message to control LIGHTNING1 devices
+--- Creates message for LIGHTING1 (0x10) protocol
+-- Encodes a message to control LIGHTING1 devices
 -- @param subtype the type of the device
 -- @param housecode the group selector on the device group
 -- @param unitcode the device selector on the device
 -- @param command the command to send
 -- @return a binary "string"
 
-E[LIGHTNING1] = function(subtype, housecode, unitcode, command)
-  return build{LIGHTNING1, subtype, 0, housecode, unitcode, command, 0}
-end ----------  end of function E[LIGHTNING1]  ----------
+E[LIGHTING1] = function(subtype, housecode, unitcode, command)
+  return build{LIGHTING1, subtype, 0, housecode, unitcode, command, 0}
+end ----------  end of function E[LIGHTING1]  ----------
 
---- Creates message for LIGHTNING2 (0x11) protocol
--- Encodes a message to control LIGHTNING2 devices
+--- Creates message for LIGHTING2 (0x11) protocol
+-- Encodes a message to control LIGHTING2 devices
 -- @param subtype the type of the device
 -- @param id the group selector for the device group
 -- @param unitcode the the device selector for the device
@@ -120,9 +231,9 @@ end ----------  end of function E[LIGHTNING1]  ----------
 -- @param level the level to fade to
 -- @return a binary "string"
 
-E[LIGHTNING2] = function(subtype, id, unitcode, command, level)
-  return build{LIGHTNING2, subtype, 0,splitid(id, 4),unitcode, command, level, 0}
-end ----------  end of function E[LIGHTNING2]  ----------
+E[LIGHTING2] = function(subtype, id, unitcode, command, level)
+  return build{LIGHTING2, subtype, 0,splitid(id, 4),unitcode, command, level, 0}
+end ----------  end of function E[LIGHTING2]  ----------
 
 M.encode = E
 return M
