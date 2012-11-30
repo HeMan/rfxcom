@@ -162,7 +162,7 @@ end ----------  end of function parsers[UNDECODEDRF]  ----------
 -- @param indata is "raw" data in a table
 -- @return table with remote command
 
-parsers[LIGHTNING1] = function(indata)
+parsers[LIGHTING1] = function(indata)
   local t = {}
 
   local subtypes = { [0x00] = 'X10 lighting', 'ARC', 'ELRO AB400D (Flamingo)',
@@ -180,7 +180,7 @@ parsers[LIGHTNING1] = function(indata)
 
   return t
 
-end ----------  end of function parsers[LIGHTNING1]  ----------
+end ----------  end of function parsers[LIGHTING1]  ----------
 
 
 --- Parses data from remote
@@ -188,7 +188,7 @@ end ----------  end of function parsers[LIGHTNING1]  ----------
 -- @param indata is "raw" data in a table
 -- @return table with remote command
 
-parsers[LIGHTNING2] = function(indata)
+parsers[LIGHTING2] = function(indata)
   local t = {}
 
   local subtypes = { [0] = 'AC', 'HomeEasy EU', 'ANSLUT' }
@@ -203,7 +203,7 @@ parsers[LIGHTNING2] = function(indata)
   t.rssi = bit.band(indata[10], 0x0F)
 
   return t
-end ----------  end of function parsers[LIGHTNING2]  ----------
+end ----------  end of function parsers[LIGHTING2]  ----------
 
 
 --- Parses data from temp sensors
