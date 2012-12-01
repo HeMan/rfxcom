@@ -22,10 +22,12 @@ local M = {}
 
 local E = {}
 
---- @class Protocol
--- Base class for sending commands with rfxcom
-
 Protocol = {}
+
+-----------------------------------------------
+-- Base class for sending commands with rfxcom
+-- @class table
+-- @name Protocol
 
 function Protocol:new()
   o = {}   -- create object if user does not provide one
@@ -34,7 +36,7 @@ function Protocol:new()
   return o
 end  -----------  end of function Protocol:new  ----------
 
---- Sends data
+-------------------------
 -- Uses tty to send data
 -- @parm data to send
 -- @return number of bytes sent
@@ -43,7 +45,7 @@ function Protocol:send(data)
   return tty:write(data)
 end  ----------  end of function Protocol:send  ----------
 
---- builds binary blob
+-----------------------------------------------------------------------------
 -- Internal function to take integers, strings and tables and serialize them
 -- to a binary "string" and add length as first character
 -- @param arg an table that could contain integers, strings or tables
@@ -68,7 +70,7 @@ function Protocol:build ( arg )
   return string.char(string.len(blob))..blob
 end  ----------  end of function build  ----------
 
---- Splits number to bytes
+------------------------------------------------------
 -- Internal function to split a large number to bytes
 -- @param id the number to be splitted
 -- @param idbytes the number of bytes it represents
@@ -85,9 +87,12 @@ function Protocol:splitid(id, idbytes)
   return idstring
 end ----------  end of function splitid  ----------
 
---- @class baseclass for all lighting protocolls
--- Has four standard methods (off, on, groupon and groupoff)
+-------------------------------------------------------------------
+-- The baseclass for all lighting protocolls. It has four standard 
+-- methods (off, on, groupon and groupoff)
 -- constructor takes command values when default don't work
+-- @class table
+-- @name Lighting
 
 Lighting = Protocol:new()
 function Lighting:new(commands)
@@ -102,8 +107,8 @@ function Lighting:new(commands)
 	return o
 end  ----------  end of function Lighting:new  ----------
 
---- abstract function
--- Abstract function for regula operations
+--------------------------------------------
+-- Abstract function for regular operations
 -- @parm id is a table with id of the receiver
 -- @parm command on/off/groupon/groupoff for the receiver
 
@@ -111,7 +116,7 @@ function Lighting:base(id, command)
 	assert(false,"Not implemented")
 end  ----------  end of function Lighting:base  ----------
 
---- Turn on light
+--------------------------------
 -- Turn on light, base function
 -- @parm id is a table with id of the receiver
 function Lighting:on(id)
@@ -119,7 +124,7 @@ function Lighting:on(id)
 end  ----------  end of function Lighting:base  ----------
 
 
---- Turn off light
+---------------------------------
 -- Turn off light, base function
 -- @parm id is a table with id of the receiver
 function Lighting:off(id)
@@ -127,7 +132,7 @@ function Lighting:off(id)
 end  ----------  end of function Lighting:base  ----------
 
 
---- Turn on light group
+--------------------------------------
 -- Turn on light group, base function
 -- @parm id is a table with id of the receiver
 function Lighting:groupon(id)
@@ -135,30 +140,46 @@ function Lighting:groupon(id)
 end  ----------  end of function Lighting:base  ----------
 
 
---- Turn off light group
+---------------------------------------
 -- Turn off light group, base function
 -- @parm id is a table with id of the receiver
 function Lighting:groupoff(id)
 	self:send(self:base(id, self.commands.groupoff))
 end  ----------  end of function Lighting:base  ----------
 
---- @class Lighting1
+--------------------------------------
 -- Implements the LIGHTING1 protocoll
+-- @class table
+-- @name Lighting1
 
 Lighting1 = Lighting:new{}
+
+-------------------------------------------
+-- Override abstract function with code for LIGHTING1 protocol
+-- @parm id is a table with id of the receiver
+-- @parm command is what command to perform
+-- @return blob to send
 function Lighting1:base(id, command)
 	return self.build{LIGHTING1, id.subtype, 0, id.housecode, id.unitcode, command}
 end  ----------  end of function Lighting:base  ----------
 
---- @class Lighting2
+--------------------------------------
 -- Implements the LIGHTING2 protocoll
+-- @class table
+-- @name Lighting2
 
 Lighting2 = Lighting:new{groupoff=3, groupon=4}
+
+-------------------------------------------
+-- Override abstract function with code for LIGHTING2 protocol
+-- @parm id is a table with id of the receiver
+-- @parm command is what command to perform
+-- @return blob to send
 function Lighting2:base(id, command)
 	return self.build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, command, 2}
 end  ----------  end of function Lighting:base  ----------
 
---- LIGHTING2 extra functions
+----------------------------------------------------------
 -- LIGHTING2 has two extra functions compare to LIGHTING1
 -- setlevel is one of them
 function Lighting2:setlevel(id)
@@ -166,7 +187,7 @@ function Lighting2:setlevel(id)
 end  ----------  end of function Lighting:base  ----------
 
 
---- LIGHTING2 extra functions
+----------------------------------------------------------
 -- LIGHTING2 has two extra functions compare to LIGHTING1
 -- setlevel is one of them
 function Lighting2:setgrouplevel(id)
