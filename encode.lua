@@ -90,6 +90,41 @@ function Protocol:splitid(id, idbytes)
   return idstring
 end ----------  end of function splitid  ----------
 
+--- Creates reset message
+-- This creates a reset message for the RFXcom
+-- @return a binary "string"
+
+function Protocol:reset()
+  return self:send(self:build{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+end  ----------  end of function M.reset  ----------
+
+--- Creates get status message
+-- This creates a message that asks for the RFXcom status
+-- @return a binary "string"
+
+function Protocol:get_status()
+  return self:send(self:build{0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+end  ----------  end of function M.get_status  ----------
+
+--- Creates enable all message
+-- This creates a messa ge that ask the RFXcom to turn on all it's
+-- known protocols.
+-- @return a binary "string"
+
+function Protocol:enable_all ()
+  return self:send(self:build{0, 0, 0, 3, 0x53, 0, 0x07, 0xBF, 0xFF, 0, 0, 0, 0})
+end  ----------  end of function M.enable_all  ----------
+
+--- Creates enable undecoded message
+-- The RFXcom could read some protocolls that it hasn't got a decoder for.
+-- This is by default turned off, but this message turns it on.
+-- @return a binary "string"
+
+function Protocol:enable_undecoded ()
+  return self:send(self:build{0, 0, 0, 3, 0x53, 0, 0x87, 0xBF, 0xFF, 0, 0, 0, 0})
+end  ----------  end of function M.enable_undecoded  ----------
+
+
 -------------------------------------------------------------------
 -- The baseclass for all lighting protocolls. It has four standard 
 -- methods (off, on, groupon and groupoff).
@@ -171,7 +206,7 @@ Lighting1 = Lighting:new{}
 -- @parm command is what command to perform
 -- @return blob to send
 function Lighting1:base(id, command)
-	return self.build{LIGHTING1, id.subtype, 0, id.housecode, id.unitcode, command}
+	return self:build{LIGHTING1, id.subtype, 0, id.housecode, id.unitcode, command}
 end  ----------  end of function Lighting:base  ----------
 
 --------------------------------------
@@ -188,7 +223,7 @@ Lighting2 = Lighting:new{groupoff=3, groupon=4}
 -- @return blob to send
 -- @see Lighting2
 function Lighting2:base(id, command)
-	return self.build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, command, 2}
+	return self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, command, 2}
 end  ----------  end of function Lighting:base  ----------
 
 ----------------------------------------------------------
@@ -197,7 +232,7 @@ end  ----------  end of function Lighting:base  ----------
 -- @parm id is a table with id of receiver
 -- @see Lighting2
 function Lighting2:setlevel(id)
-	self:send(self.build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 2, id.level})
+	self:send(self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 2, id.level})
 end  ----------  end of function Lighting:base  ----------
 
 
@@ -207,45 +242,13 @@ end  ----------  end of function Lighting:base  ----------
 -- @parm id is a table with id of receiver
 -- @see Lighting2
 function Lighting2:setgrouplevel(id)
-	self:send(self.build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 5, id.level})
+	self:send(self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 5, id.level})
 end  ----------  end of function Lighting:base  ----------
 
+M.Protocol = Protocol
+M.Lighting = Lighting
 M.Lighting1 = Lighting1
 M.Lighting2 = Lighting2
-
---- Creates reset message
--- This creates a reset message for the RFXcom
--- @return a binary "string"
-
-function M.reset()
-  return build{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-end  ----------  end of function M.reset  ----------
-
---- Creates get status message
--- This creates a message that asks for the RFXcom status
--- @return a binary "string"
-
-function M.get_status()
-  return build{0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-end  ----------  end of function M.get_status  ----------
-
---- Creates enable all message
--- This creates a messa ge that ask the RFXcom to turn on all it's
--- known protocols.
--- @return a binary "string"
-
-function M.enable_all ()
-  return build{0, 0, 0, 3, 0x53, 0, 0x07, 0xBF, 0xFF, 0, 0, 0, 0}
-end  ----------  end of function M.enable_all  ----------
-
---- Creates enable undecoded message
--- The RFXcom could read some protocolls that it hasn't got a decoder for.
--- This is by default turned off, but this message turns it on.
--- @return a binary "string"
-
-function M.enable_undecoded ()
-  return build{0, 0, 0, 3, 0x53, 0, 0x87, 0xBF, 0xFF, 0, 0, 0, 0}
-end  ----------  end of function M.enable_undecoded  ----------
 
 return M
 
