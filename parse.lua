@@ -16,7 +16,10 @@
 --
 
 local bit = require "nixio".bit
-require "common"
+
+local rfxcompath = (...):match("(.-)[^%.]+$") 
+
+require(rfxcompath .. "common")
 
 local M = {}
 local parsers = {}
