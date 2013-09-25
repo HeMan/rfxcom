@@ -114,8 +114,17 @@ end  ----------  end of function M.get_status  ----------
 -- @return a binary "string"
 
 function Protocol:enable_all ()
-  return self:send(self:build{0, 0, 0, 3, 0x53, 0, 0x07, 0xBF, 0xFF, 0, 0, 0, 0})
+  return self:send(self:build{0, 0, 0, 3, 0x53, 0, 0x77, 0xBF, 0xFF, 0, 0, 0, 0})
 end  ----------  end of function M.enable_all  ----------
+
+--- Creates an enble message with selected protocolls
+-- This creates a message that asks the RFXcom to turn on selected
+-- protocols.
+-- @return a binary "string"
+
+function Protocol:enable_some(msg3, msg4, msg5)
+  return self:send(self:build{0, 0, 0, 3, 0x53, 0, msg3, msg4, msg5, 0, 0, 0, 0})
+end ----------- end of function M.enable_some -----------
 
 --- Creates enable undecoded message
 -- The RFXcom could read some protocolls that it hasn't got a decoder for.
