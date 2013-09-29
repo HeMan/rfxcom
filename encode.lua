@@ -147,18 +147,18 @@ end  ----------  end of function M.enable_undecoded  ----------
 Lighting = Protocol:new()
 
 function Lighting:new(commands, id)
-	o = {}
-	setmetatable(o, self)
-	self.__index = self
-	self.commands = {}
-	self.commands.on = commands.on or 1
-	self.commands.off = commands.off or 0
-	self.commands.groupon = commands.groupon or 6
-	self.commands.groupoff = commands.groupoff or 5
-	if id then
-		self.id = id
-	end
-	return o
+    o = {}
+    setmetatable(o, self)
+    self.__index = self
+    self.commands = {}
+    self.commands.on = commands.on or 1
+    self.commands.off = commands.off or 0
+    self.commands.groupon = commands.groupon or 6
+    self.commands.groupoff = commands.groupoff or 5
+    if id then
+        self.id = id
+    end
+    return o
 end  ----------  end of function Lighting:new  ----------
 
 --------------------------------------------
@@ -168,7 +168,7 @@ end  ----------  end of function Lighting:new  ----------
 -- @see Lighting
 
 function Lighting:base(command, id)
-	assert(false,"Not implemented")
+    assert(false,"Not implemented")
 end  ----------  end of function Lighting:base  ----------
 
 --------------------------------
@@ -176,7 +176,7 @@ end  ----------  end of function Lighting:base  ----------
 -- @parm id is a table with id of the receiver
 -- @see Lighting
 function Lighting:on(id)
-	self:send(self:base(id or self.id, self.commands.on))
+    self:send(self:base(id or self.id, self.commands.on))
 end  ----------  end of function Lighting:base  ----------
 
 
@@ -185,7 +185,7 @@ end  ----------  end of function Lighting:base  ----------
 -- @parm id is a table with id of the receiver
 -- @see Lighting
 function Lighting:off(id)
-	self:send(self:base(id or self.id, self.commands.off))
+    self:send(self:base(id or self.id, self.commands.off))
 end  ----------  end of function Lighting:base  ----------
 
 
@@ -194,7 +194,7 @@ end  ----------  end of function Lighting:base  ----------
 -- @parm id is a table with id of the receiver
 -- @see Lighting
 function Lighting:groupon(id)
-	self:send(self:base(id or self.id, self.commands.groupon))
+    self:send(self:base(id or self.id, self.commands.groupon))
 end  ----------  end of function Lighting:base  ----------
 
 
@@ -203,7 +203,7 @@ end  ----------  end of function Lighting:base  ----------
 -- @parm id is a table with id of the receiver
 -- @see Lighting
 function Lighting:groupoff(id)
-	self:send(self:base(id or self.id, self.commands.groupoff))
+    self:send(self:base(id or self.id, self.commands.groupoff))
 end  ----------  end of function Lighting:base  ----------
 
 --------------------------------------
@@ -220,10 +220,10 @@ Lighting1 = Lighting:new({})
 -- @parm command is what command to perform
 -- @return blob to send
 function Lighting1:base(command, id)
-	if self.id then
-		id = self.id
-	end
-	return self:build{LIGHTING1, id.subtype, 0, id.housecode, id.unitcode, command}
+    if self.id then
+        id = self.id
+    end
+    return self:build{LIGHTING1, id.subtype, 0, id.housecode, id.unitcode, command}
 end  ----------  end of function Lighting:base  ----------
 
 --------------------------------------
@@ -240,10 +240,10 @@ Lighting2 = Lighting:new({groupoff=3, groupon=4})
 -- @return blob to send
 -- @see Lighting2
 function Lighting2:base(command, id)
-	if self.id then
-		id = self.id
-	end
-	return self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, command, 2}
+    if self.id then
+        id = self.id
+    end
+    return self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, command, 2}
 -- :BUG:2012-12-25 22:32:54::  Should it really be "2" as last argument
 end  ----------  end of function Lighting:base  ----------
 
@@ -253,7 +253,7 @@ end  ----------  end of function Lighting:base  ----------
 -- @parm id is a table with id of receiver
 -- @see Lighting2
 function Lighting2:setlevel(level, id)
-	self:send(self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 2, level})
+    self:send(self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 2, level})
 end  ----------  end of function Lighting:base  ----------
 
 
@@ -263,10 +263,10 @@ end  ----------  end of function Lighting:base  ----------
 -- @parm id is a table with id of receiver
 -- @see Lighting2
 function Lighting2:setgrouplevel(level, id)
-	if self.id then
-		id = self.id
-	end
-	self:send(self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 5, level})
+    if self.id then
+        id = self.id
+    end
+    self:send(self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 5, level})
 end  ----------  end of function Lighting:base  ----------
 
 M.Protocol = Protocol
