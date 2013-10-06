@@ -48,60 +48,56 @@ RFXSENSOR = 0x70
 RFXMETER = 0x71
 FS20 = 0x72
 
-LIGHTING1 = { ["ID"] = 0x10,
-              ["SUBTYPES"] = { [0x00] = 'X10 lighting', 'ARC',
+LIGHTING1 = { ID = 0x10,
+              SUBTYPES = { [0x00] = 'X10 lighting', 'ARC',
                                'ELRO AB400D (Flamingo)', 'Waveman',
                                'Chacon EMW200', 'IMPULS', 'RisingSun',
                                'Philips SBC' },
-              ["COMMANDS"] = { [0x00] = 'Off', 'On', 'Dim', 'Bright',
+              COMMANDS = { [0x00] = 'Off', 'On', 'Dim', 'Bright',
                                         'All/group off', 'All/group on',
                                         'Chime', [0xFF]='Illigal command' },
              }
 
-LIGHTING2 = { ["ID"] = 0x11,
-              ["SUBTYPES"] = { [0] = 'AC', 'HomeEasy EU', 'ANSLUT' },
-              ["COMMANDS"] = { [0] = 'Off', 'On', 'Set level', 
+LIGHTING2 = { ID = 0x11,
+              SUBTYPES = { [0] = 'AC', 'HomeEasy EU', 'ANSLUT' },
+              COMMANDS = { [0] = 'Off', 'On', 'Set level', 
                                      'Group off', 'Group on','Set group level' }
         }
 
-TEMP = { ["ID"] = 0x50,
-         ["SUBTYPES"] = { "THR128/138, THC138", 
+TEMP = { ID = 0x50,
+         SUBTYPES = { "THR128/138, THC138", 
                           "THC238/268, THN132, THWR288, THRN122, THN122, AW129/131",
                           "THWR800", "RTHN318", "La Crosse TX3, TX4, TX17",
                           "TS15C", "Viking 02811", "La Crosse WS2300", 
               "RUBiCSON", "TFA 30.3133" }
           }
 
-TEMPHUM = { ["ID"] = 0x51,
-            ["SUBTYPES"] ={ [0x01] = "THGN122/123, THGN132, THGR122/228/238/268",
+TEMPHUM = { ID = 0x51,
+            SUBTYPES ={ [0x01] = "THGN122/123, THGN132, THGR122/228/238/268",
                             "THGR810, THGN800", "RTGR328", "THGR328", "WTGR800",
                             "THGR918, THGRN228, THGN500", "TFA TS34C, Cresta", 
                             "WT260,WT260H,WT440H,WT450,WT450H",
                             "Viking 02035,02038" },
-        ["HUMSTATUS"] = { [0x00] = "Dry", "Comfort", "Normal", "Wet" }
+        HUMSTATUS = { [0x00] = "Dry", "Comfort", "Normal", "Wet" }
           }
-
-
-
-
 
 
 -- INTERFACE CONTROLL types
 -- msg3
 msg3 = {
-  ["UNDECODED"] = 0x80, ["RFU6"] = 0x40, ["RFU5"] = 0x20,
-  ["RSL"] = 0x10, ["Lighting4"] = 0x08, ["Viking"] = 0x04,
-  ["Rubicson"] = 0x02, ["AEBlyss"] = 0x01,
+  UNDECODED = 0x80, RFU6 = 0x40, RFU5 = 0x20,
+  RSL = 0x10, Lighting4 = 0x08, Viking = 0x04,
+  Rubicson = 0x02, AEBlyss = 0x01,
 }
 
 msg4 = {
-  ["BlindsT1234"] = 0x80, ["BlindsT0"] = 0x40, ["Proguard"] = 0x20,
-  ["FS20"] = 0x10, ["LaCrosse"] = 0x08, ["Hideki"] = 0x04,
-  ["ADLightwaveRF"] = 0x02, ["Mertik"] = 0x01,
+  BlindsT1234 = 0x80, BlindsT0 = 0x40, Proguard = 0x20,
+  FS20 = 0x10, LaCrosse = 0x08, Hideki = 0x04,
+  ADLightwaveRF = 0x02, Mertik = 0x01,
 }
 
 msg5 = {
-  ["Visonic"] = 0x80, ["ATI"] = 0x40, ["OregonScientific"] = 0x20,
-  ["Meiantech"] = 0x10, ["HomeEasyEU"] = 0x08, ["AC"] = 0x04,
-  ["ARC"] = 0x02, ["X10"] = 0x01,
+  Visonic = 0x80, ATI = 0x40, OregonScientific = 0x20,
+  Meiantech = 0x10, HomeEasyEU = 0x08, AC = 0x04,
+  ARC = 0x02, X10 = 0x01,
 }
