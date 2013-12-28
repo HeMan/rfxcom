@@ -80,28 +80,21 @@ parsers[INTERFACE] = function(indata)
       "868.00MHz", "868.00MHz FSK", "868.30MHz", 
       "868.30MHz FSK", "868.35MHz", "868.35MHz FSK",
       "868.95MHz" }
-  local msg3 = { [0x80] = 'Undecoded', [0x40] = 'RFU6', [0x20] = 'RFU5',
-      [0x10] = 'RFU4', [0x08] = 'RFU3',
-      [0x04] = 'FineOffset/Vikin', [0x02] = 'Rubicson',
-      [0x01] = 'AE' }
-  local msg4 = { [0x80] = 'BlindsT1', [0x40] = 'BlindsT0',
-      [0x20] = 'ProGuard', [0x10] = 'FS20',
-      [0x08] = 'La Crosse', [0x04] = 'Hideki/UPM',
-      [0x02] = 'LightwaveRF', [0x01] = 'Metrik' }
-  local msg5 = { [0x80] = 'Visonic', [0x40] = 'ATI',
-      [0x20] = 'Oregon Scientific', [0x10] = 'Meiantech',
-      [0x08] = 'HomeEasy EU', [0x04] = 'AC',
-      [0x02] = 'ARC', [0x01] = 'X10' }
 
   local function bitmap(val, map, enabled, disabled)
+    local revmap={}
+    for k,v in pairs(map) do
+      revmap[v]=k
+    end
+
     if (type(val) == "number") then
-      for s,c in pairs(map) do
+      for s,c in pairs(revmap) do
         if bit.check(val, s) then
           table.insert(enabled, c)
         else
           table.insert(disabled, c)
         end -- if bit set
-      end -- for 
+      end -- for
     end
     return enabled, disabled
   end ----------  end of function bitmap  ----------
@@ -165,20 +158,13 @@ end ----------  end of function parsers[UNDECODEDRF]  ----------
 -- @param indata is "raw" data in a table
 -- @return table with remote command
 
-parsers[LIGHTING1] = function(indata)
+parsers[LIGHTING1.ID] = function(indata)
   local t = {}
-
-  local subtypes = { [0x00] = 'X10 lighting', 'ARC', 'ELRO AB400D (Flamingo)',
-      'Waveman', 'Chacon EMW200', 'IMPULS', 'RisingSun',
-      'Philips SBC' }
-  local command = { [0x00] = 'Off', 'On', 'Dim', 'Bright', 'All/group off',
-      'All/group on', 'Chime', [0xFF]='Illigal command' }
-
-  t = parsesome(indata, subtypes, 2)
+  t = parsesome(indata, LIGHTING1.SUBTYPES, 2)
 
   t.housecode = string.char(indata[3])
   t.unitcode = indata[4]
-  t.command = command[indata[5]]
+  t.command = LIGHTING1.COMMANDS[indata[5]]
   t.rssi = bit.band(indata[6], 0x0F)
 
   return t
@@ -191,17 +177,14 @@ end ----------  end of function parsers[LIGHTING1]  ----------
 -- @param indata is "raw" data in a table
 -- @return table with remote command
 
-parsers[LIGHTING2] = function(indata)
+parsers[LIGHTING2.ID] = function(indata)
   local t = {}
 
-  local subtypes = { [0] = 'AC', 'HomeEasy EU', 'ANSLUT' }
-  local commands = { [0] = 'Off', 'On', 'Set leve', 'Group off', 'Group on','Set group level' }
-
-  t = parsesome(indata, subtypes, 4)
+  t = parsesome(indata, LIGHTING2.SUBTYPES, 4)
 
   t.unitcode = indata[7]
   t.cmnd = indata[8]
-  t.command = commands[indata[8]]
+  t.command = LIGHTING2.COMMANDS[indata[8]]
   t.level = indata[9]
   t.rssi = bit.band(indata[10], 0x0F)
 
@@ -214,15 +197,9 @@ end ----------  end of function parsers[LIGHTING2]  ----------
 -- @param indata is "raw" data in a table
 -- @return table with temp, battery status and radio level
 
-parsers[TEMP] = function(indata)
+parsers[TEMP.ID] = function(indata)
   local t = {}
-  local subtypes = { "THR128/138, THC138", 
-  "THC238/268, THN132, THWR288, THRN122, THN122, AW129/131",
-  "THWR800","RTHN318","La Crosse TX3, TX4, TX17",
-  "TS15C", "Viking 02811", "La Crosse WS2300", "RUBiCSON",
-  "TFA 30.3133" }
-
-  t = parsesome(indata, subtypes, 2)
+  t = parsesome(indata, TEMP.SUBTYPES, 2)
 
   t.tempraw = indata[5]*256 + indata[6]
   t.temp = ((bit.band(indata[5], 0x7F))*256 + indata[6])/10
@@ -242,24 +219,20 @@ end ----------  end of function parsers[TEMP]  ----------
 -- @param indata is "raw" data in a table
 -- @return table with temp, humidity, battery status and radio level
 
-parsers[TEMPHUM] = function(indata)
+parsers[TEMPHUM.ID] = function(indata)
   local t = {}
-	local subtypes = { [0x01] = "THGN122/123, THGN132, THGR122/228/238/268",
-  "THGR810, THGN800", "RTGR328", "THGR328", "WTGR800", "THGR918, THGRN228, THGN500",
-	"TFA TS34C, Cresta", "WT260,WT260H,WT440H,WT450,WT450H", "Viking 02035,02038" }
-	local humstatus = { [0x00] = "Dry", "Comfort", "Normal", "Wet" }
 
-	t = parsesome(indata, subtypes, 2)
+  t = parsesome(indata, TEMPHUM.SUBTYPES, 2)
 
-	t.tempraw = indata[5]*256 + indata[6]
+  t.tempraw = indata[5]*256 + indata[6]
   t.temp = ((bit.band(indata[5], 0x7F))*256 + indata[6])/10
 
   if (bit.band(indata[5], 0x80) == 0x80) then
     t.temp = -t.temp
   end -- if negative
 
-	t.humidity = indata[7]
-	t.humstatus = humstatus[indata[8]]
+  t.humidity = indata[7]
+  t.humstatus = TEMPHUM.HUMSTATUS[indata[8]]
 
   t.battery = bit.rshift(indata[9], 4)
   t.rssi = bit.band(indata[9], 0x0F)
