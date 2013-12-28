@@ -114,7 +114,7 @@ end  ----------  end of function M.get_status  ----------
 -- @return a binary "string"
 
 function Protocol:enable_all ()
-  return self:send(self:build{0, 0, 0, 3, 0x53, 0, 0x07, 0xBF, 0xFF, 0, 0, 0, 0})
+  return self:send(self:build{0, 0, 0, 3, 0x53, 0, 0xF7, 0xBF, 0xFF, 0, 0, 0, 0})
 end  ----------  end of function M.enable_all  ----------
 
 --- Creates enable undecoded message
@@ -228,7 +228,6 @@ Lighting2 = Lighting:new({groupoff=3, groupon=4})
 -- Override abstract function with code for LIGHTING2 protocol
 -- @parm id is a table with id of the receiver
 -- @parm command is what command to perform
--- @return blob to send
 -- @see Lighting2
 function Lighting2:base(command, id)
 	if self.id then
