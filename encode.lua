@@ -223,7 +223,7 @@ function Lighting1:base(command, id)
     if self.id then
         id = self.id
     end
-    return self:build{LIGHTING1, id.subtype, 0, id.housecode, id.unitcode, command}
+    return self:build{LIGHTING1.ID, id.subtype, 0, id.housecode, id.unitcode, command}
 end  ----------  end of function Lighting:base  ----------
 
 --------------------------------------
@@ -237,12 +237,13 @@ Lighting2 = Lighting:new({groupoff=3, groupon=4})
 -- Override abstract function with code for LIGHTING2 protocol
 -- @parm id is a table with id of the receiver
 -- @parm command is what command to perform
+-- @return blob to send
 -- @see Lighting2
 function Lighting2:base(command, id)
     if self.id then
         id = self.id
     end
-    return self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, command, 2}
+    return self:build{LIGHTING2.ID, id.subtype, 0, splitid(id.id, 4), id.unitcode, command, 2}
 -- :BUG:2012-12-25 22:32:54::  Should it really be "2" as last argument
 end  ----------  end of function Lighting:base  ----------
 
@@ -252,7 +253,7 @@ end  ----------  end of function Lighting:base  ----------
 -- @parm id is a table with id of receiver
 -- @see Lighting2
 function Lighting2:setlevel(level, id)
-    self:send(self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 2, level})
+    self:send(self:build{LIGHTING2.ID, id.subtype, 0, splitid(id.id, 4), id.unitcode, 2, level})
 end  ----------  end of function Lighting:base  ----------
 
 
@@ -265,7 +266,7 @@ function Lighting2:setgrouplevel(level, id)
     if self.id then
         id = self.id
     end
-    self:send(self:build{LIGHTING2, id.subtype, 0, splitid(id.id, 4), id.unitcode, 5, level})
+    self:send(self:build{LIGHTING2.ID, id.subtype, 0, splitid(id.id, 4), id.unitcode, 5, level})
 end  ----------  end of function Lighting:base  ----------
 
 M.Protocol = Protocol
